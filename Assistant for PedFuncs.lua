@@ -130,44 +130,43 @@ function main()
 				printHelpString((active and 'Assistant for PedFuncs activated' or 'Assistant for PedFuncs deactivated'))
 			end
 		end
+		
 		if active then
 			local rresult, pped = getCharPlayerIsTargeting(PLAYER_HANDLE)
 			if rresult then
+				freezeCharPosition(PLAYER_PED, true)
 				local skin_id = getCharModel(pped)
 				renderFontDrawText(my_font, 'Index: '..index..'\nModel: '..NameModel(skin_id)..'('..skin_id..')\n_remap: '..pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index)..'\n{ff6666}Counting goes from the end\n{ff6666}For example here bmydj_remap0 is equal to bmydj_remap(last) in bmydj.txd\n{ff6666}If the skin is broken, it means that _remap is the last :)', sw / 2, sh / 2, 0xFFFFFFFF)
-				if isKeyDown(vkeys.VK_RBUTTON) then
-					freezeCharPosition(PLAYER_PED, true)
-					else
-					freezeCharPosition(PLAYER_PED, false)
-				end
-				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyReleased(vkeys.VK_UP) then
+				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyPressed(vkeys.VK_UP) then
 					if index >= 0 and index <= 4 then 
 						index = index + 1
 					else 
 						index = 0
 					end
 				end
-				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyReleased(vkeys.VK_DOWN) then
+				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyPressed(vkeys.VK_DOWN) then
 					if index >= 0 and index <= 4 then 
 						index = index - 1
 					else 
 						index = 0
 					end
 				end
-				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyReleased(vkeys.VK_RIGHT) then
+				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyPressed(vkeys.VK_RIGHT) then
 					if pedfuncs.Ext_GetPedRemap(getCharPointer(pped), 0) >= -1 then 
 						pedfuncs.Ext_SetPedRemap(getCharPointer(pped), index, pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index) + 1)
 					else
 						pedfuncs.Ext_SetPedRemap(getCharPointer(pped), 0, -1)
 					end
 				end
-				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyReleased(vkeys.VK_LEFT) then
+				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyPressed(vkeys.VK_LEFT) then
 					if pedfuncs.Ext_GetPedRemap(getCharPointer(pped), 0) >= -1 then 
 						pedfuncs.Ext_SetPedRemap(getCharPointer(pped), index, pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index) - 1)
 					else
 						pedfuncs.Ext_SetPedRemap(getCharPointer(pped), 0, -1)
 					end
 				end
+			else
+				freezeCharPosition(PLAYER_PED, false)
 			end
 		end
 	end
