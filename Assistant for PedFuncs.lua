@@ -4,7 +4,7 @@ script_description("Assistant for PedFuncs")
 script_url("https://vk.com/dmitriyewichmods")
 script_dependencies("ffi")
 script_properties('work-in-pause')
-script_version('1.0.2')
+script_version('1.0.3')
 
 require("moonloader")
 local dlstatus = require "moonloader".download_status
@@ -94,9 +94,8 @@ ffi.cdef[[
 
 local my_font = renderCreateFont('Verdana', 12, 12)
 active = false
+
 function main()
-	-- if not isSampfuncsLoaded() or not isSampLoaded() then return end
-	-- while not isSampAvailable() do wait(100) end
 	checklibs()
 	local samp = 0
 	if isSampLoaded() then
@@ -108,66 +107,71 @@ function main()
 		end
 	end
 	if samp == 2 then
+		sampRegisterChatCommand('pdremap', function(arg)
+			active = not active
+			sampAddChatMessage((active and 'User Control Remap for PedFuncs activated, {ff6666}RMB + Left/Right - _remap, RMB + Up/Down - index' or 'User Control Remap for PedFuncs deactivated'), -1)
+		end)
+		sampSetClientCommandDescription('pdremap', (string.format('Active remap for PedFuncs, File: %s', thisScript().filename)))
+		
 		sampRegisterChatCommand('setremap', function(arg) set_remap(arg) end)
-		sampSetClientCommandDescription('setremap', (string.format('Set remap for PedFuncs, File: %s', thisScript().filename)))
+		sampSetClientCommandDescription('setremap', (string.format('User set remap for PedFuncs, File: %s', thisScript().filename)))
 
 		sampRegisterChatCommand('getremap', function(arg) get_remap(arg) end)
-		sampSetClientCommandDescription('getremap', (string.format('Get remap for PedFuncs, File: %s', thisScript().filename)))
-		
-		wait(-1)
+		sampSetClientCommandDescription('getremap', (string.format('Use get remap for PedFuncs, File: %s', thisScript().filename)))
 	end
 	
 	local sw, sh = getScreenResolution()
 	local index = 0
-	if samp == 0 or samp == 1 then
-		while true do wait(0)
+
+	while true do wait(0)
+		if samp == 0 or samp == 1 then
 			if testCheat("remap") then
 				active = not active
 				printHelpString((active and 'User Control Remap for PedFuncs activated' or 'User Control Remap for PedFuncs deactivated'))
-			end	
-			if active then
-				local rresult, pped = getCharPlayerIsTargeting(PLAYER_HANDLE)
-				if rresult then -- and wasKeyReleased(vkeys.VK_RBUTTON)
-					local skin_id = getCharModel(pped)
-					-- printString(NameModel(skin_id), 1000)
-					renderFontDrawText(my_font, 'Index: '..index..'\nModel: '..NameModel(skin_id)..'('..skin_id..')\n_remap: '..pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index)..'\n{ff6666}Counting goes from the end\n{ff6666}For example here bmydj_remap0 is equal to bmydj_remap(last) in bmydj.txd\n{ff6666}If the skin is broken, it means that _remap is the last :)', sw / 2, sh / 2, 0xFFFFFFFF)
-					if isKeyDown(vkeys.VK_RBUTTON) then
-						freezeCharPosition(PLAYER_PED, true)
-						else
-						freezeCharPosition(PLAYER_PED, false)
+			end
+		end
+		if active then
+			local rresult, pped = getCharPlayerIsTargeting(PLAYER_HANDLE)
+			if rresult then
+				local skin_id = getCharModel(pped)
+				renderFontDrawText(my_font, 'Index: '..index..'\nModel: '..NameModel(skin_id)..'('..skin_id..')\n_remap: '..pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index)..'\n{ff6666}Counting goes from the end\n{ff6666}For example here bmydj_remap0 is equal to bmydj_remap(last) in bmydj.txd\n{ff6666}If the skin is broken, it means that _remap is the last :)', sw / 2, sh / 2, 0xFFFFFFFF)
+				if isKeyDown(vkeys.VK_RBUTTON) then
+					freezeCharPosition(PLAYER_PED, true)
+					else
+					freezeCharPosition(PLAYER_PED, false)
+				end
+				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyReleased(vkeys.VK_UP) then
+					if index >= 0 and index <= 4 then 
+						index = index + 1
+					else 
+						index = 0
 					end
-					if isKeyDown(vkeys.VK_RBUTTON) and wasKeyReleased(vkeys.VK_UP) then
-						if index >= 0 and index <= 4 then 
-							index = index + 1
-						else 
-							index = 0
-						end
+				end
+				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyReleased(vkeys.VK_DOWN) then
+					if index >= 0 and index <= 4 then 
+						index = index - 1
+					else 
+						index = 0
 					end
-					if isKeyDown(vkeys.VK_RBUTTON) and wasKeyReleased(vkeys.VK_DOWN) then
-						if index >= 0 and index <= 4 then 
-							index = index - 1
-						else 
-							index = 0
-						end
+				end
+				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyReleased(vkeys.VK_RIGHT) then
+					if pedfuncs.Ext_GetPedRemap(getCharPointer(pped), 0) >= -1 then 
+						pedfuncs.Ext_SetPedRemap(getCharPointer(pped), index, pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index) + 1)
+					else
+						pedfuncs.Ext_SetPedRemap(getCharPointer(pped), 0, -1)
 					end
-					if isKeyDown(vkeys.VK_RBUTTON) and wasKeyReleased(vkeys.VK_RIGHT) then
-						if pedfuncs.Ext_GetPedRemap(getCharPointer(pped), 0) >= -1 then 
-							pedfuncs.Ext_SetPedRemap(getCharPointer(pped), index, pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index) + 1)
-						else
-							pedfuncs.Ext_SetPedRemap(getCharPointer(pped), 0, -1)
-						end
-					end
-					if isKeyDown(vkeys.VK_RBUTTON) and wasKeyReleased(vkeys.VK_LEFT) then
-						if pedfuncs.Ext_GetPedRemap(getCharPointer(pped), 0) >= -1 then 
-							pedfuncs.Ext_SetPedRemap(getCharPointer(pped), index, pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index) - 1)
-						else
-							pedfuncs.Ext_SetPedRemap(getCharPointer(pped), 0, -1)
-						end
+				end
+				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyReleased(vkeys.VK_LEFT) then
+					if pedfuncs.Ext_GetPedRemap(getCharPointer(pped), 0) >= -1 then 
+						pedfuncs.Ext_SetPedRemap(getCharPointer(pped), index, pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index) - 1)
+					else
+						pedfuncs.Ext_SetPedRemap(getCharPointer(pped), 0, -1)
 					end
 				end
 			end
 		end
-	end	
+	end
+	-- end	
 end
 
 function set_remap(arg)
@@ -176,14 +180,14 @@ function set_remap(arg)
 		local skin_id = getCharModel(PLAYER_PED)
 		pedfuncs.Ext_SetPedRemap(getCharPointer(PLAYER_PED), tonumber(arg[1]), tonumber(arg[2]))
 		sampAddChatMessage('Model: '..NameModel(skin_id)..'('..skin_id..') | Index: '..arg[1]..' | _remap: '..pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), tonumber(arg[1]))..' | {ff6666}Counting goes from the end, example, bmydj_remap0 is equal to bmydj_remap(last) in .txd', -1)
-		-- sampAddChatMessage(NameModel(skin_id)..'_remap'..pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), 0)..' {ff6666}отcчет идет с конца, например тут bmydj_remap0 равен bmydj_remap(последний) в .txd', -1)
+		-- sampAddChatMessage(NameModel(skin_id)..'_remap'..pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), 0)..' {ff6666}РѕС‚cС‡РµС‚ РёРґРµС‚ СЃ РєРѕРЅС†Р°, РЅР°РїСЂРёРјРµСЂ С‚СѓС‚ bmydj_remap0 СЂР°РІРµРЅ bmydj_remap(РїРѕСЃР»РµРґРЅРёР№) РІ .txd', -1)
 	end
 	if tonumber(arg[1]) ~= nil and tonumber(arg[2]) ~= nil and tonumber(arg[3]) ~= nil then
 		result, ped = sampGetCharHandleBySampPlayerId(tonumber(arg[1]))
 		local skin_id = getCharModel(ped)
 		pedfuncs.Ext_SetPedRemap(getCharPointer(ped), tonumber(arg[2]), tonumber(arg[3]))
 		sampAddChatMessage('Model: '..NameModel(skin_id)..'('..skin_id..') | Index: '..arg[2]..' | _remap: '..pedfuncs.Ext_GetPedRemap(getCharPointer(ped), tonumber(arg[2]))..' | {ff6666}Counting goes from the end, example, bmydj_remap0 is equal to bmydj_remap(last) in .txd', -1)
-		-- sampAddChatMessage(NameModel(skin_id)..'_remap'..pedfuncs.Ext_GetPedRemap(getCharPointer(ped), 0)..' {ff6666}отcчет идет с конца, например тут bmydj_remap0 равен bmydj_remap(последний) в .txd', -1)
+		-- sampAddChatMessage(NameModel(skin_id)..'_remap'..pedfuncs.Ext_GetPedRemap(getCharPointer(ped), 0)..' {ff6666}РѕС‚cС‡РµС‚ РёРґРµС‚ СЃ РєРѕРЅС†Р°, РЅР°РїСЂРёРјРµСЂ С‚СѓС‚ bmydj_remap0 СЂР°РІРµРЅ bmydj_remap(РїРѕСЃР»РµРґРЅРёР№) РІ .txd', -1)
 	end
 end
 
@@ -195,13 +199,13 @@ function get_remap(arg)
 	if tonumber(arg[1]) ~= nil and tonumber(arg[2]) == nil then
 		local skin_id = getCharModel(PLAYER_PED)
 		sampAddChatMessage('Model: '..NameModel(skin_id)..'('..skin_id..') | Index: '..arg[1]..' | _remap: '..pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), tonumber(arg[1]))..' | {ff6666}Counting goes from the end, example, bmydj_remap0 is equal to bmydj_remap(last) in .txd', -1)
-		-- sampAddChatMessage(NameModel(skin_id)..'_remap'..pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), 0)..' {ff6666}отcчет с конца, например тут bmydj_remap0 равен bmydj_remap(последний) в .txd', -1)
+		-- sampAddChatMessage(NameModel(skin_id)..'_remap'..pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), 0)..' {ff6666}РѕС‚cС‡РµС‚ СЃ РєРѕРЅС†Р°, РЅР°РїСЂРёРјРµСЂ С‚СѓС‚ bmydj_remap0 СЂР°РІРµРЅ bmydj_remap(РїРѕСЃР»РµРґРЅРёР№) РІ .txd', -1)
 	end
 	if tonumber(arg[1]) ~= nil and tonumber(arg[2]) ~= nil then
 		result, ped = sampGetCharHandleBySampPlayerId(tonumber(arg[1]))
 		local skin_id = getCharModel(ped)
 		sampAddChatMessage('Model: '..NameModel(skin_id)..'('..skin_id..') | Index: '..arg[2]..' | _remap: '..pedfuncs.Ext_GetPedRemap(getCharPointer(ped), tonumber(arg[2]))..' | {ff6666}Counting goes from the end, example, bmydj_remap0 is equal to bmydj_remap(last) in .txd', -1)
-		-- sampAddChatMessage(NameModel(skin_id)..'_remap'..pedfuncs.Ext_GetPedRemap(getCharPointer(ped), 0)..' {ff6666}отcчет идет с конца, например тут bmydj_remap0 равен bmydj_remap(последний) в .txd', -1)
+		-- sampAddChatMessage(NameModel(skin_id)..'_remap'..pedfuncs.Ext_GetPedRemap(getCharPointer(ped), 0)..' {ff6666}РѕС‚cС‡РµС‚ РёРґРµС‚ СЃ РєРѕРЅС†Р°, РЅР°РїСЂРёРјРµСЂ С‚СѓС‚ bmydj_remap0 СЂР°РІРµРЅ bmydj_remap(РїРѕСЃР»РµРґРЅРёР№) РІ .txd', -1)
 	end
 end
 
@@ -238,13 +242,13 @@ end
 
 function downloadFile(name, path, link)
 	if not doesFileExist(path) then
-		print('Download file {006AC2}«'..name..'»')
+		print('Download file {006AC2}В«'..name..'В»')
 		downloadUrlToFile(link, path, function(id, status, p1, p2)
 			if status == dlstatus.STATUSEX_ENDDOWNLOAD then
 				if doesFileExist(path) then
-					print('File {006AC2}«'..name..'»{FFFFFF} downloaded!')
+					print('File {006AC2}В«'..name..'В»{FFFFFF} downloaded!')
 				else
-					print('Failed to load file {006AC2}«'..name..'»')
+					print('Failed to load file {006AC2}В«'..name..'В»')
 				end
 			end
 		end)
