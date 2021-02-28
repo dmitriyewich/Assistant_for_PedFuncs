@@ -132,7 +132,7 @@ function main()
 		end
 		if active then
 			local rresult, pped = getCharPlayerIsTargeting(PLAYER_HANDLE)
-			if rresult then
+			if rresult and isKeyDown(vkeys.VK_RBUTTON) then
 				local skin_id = getCharModel(pped)
 				renderFontDrawText(my_font, 'Index: '..index..'\nModel: '..NameModel(skin_id)..'('..skin_id..')\n_remap: '..pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index)..'\n{ff6666}Counting goes from the end\n{ff6666}For example here bmydj_remap0 is equal to bmydj_remap(last) in bmydj.txd\n{ff6666}If the skin is broken, it means that _remap is the last :)', sw / 2, sh / 2, 0xFFFFFFFF)
 				if isKeyDown(vkeys.VK_RBUTTON) then
