@@ -109,7 +109,7 @@ function main()
 	if samp == 2 then
 		sampRegisterChatCommand('pdremap', function(arg)
 			active = not active
-			sampAddChatMessage((active and 'User Control Remap for PedFuncs activated, {ff6666}RMB + Left/Right - _remap, RMB + Up/Down - index' or 'User Control Remap for PedFuncs deactivated'), -1)
+			sampAddChatMessage((active and 'Assistant for PedFuncs activated, {ff6666}RMB + Left/Right - _remap, RMB + Up/Down - index' or 'Assistant for PedFuncs deactivated'), -1)
 		end)
 		sampSetClientCommandDescription('pdremap', (string.format('Active remap for PedFuncs, File: %s', thisScript().filename)))
 		
@@ -127,7 +127,7 @@ function main()
 		if samp == 0 or samp == 1 then
 			if testCheat("remap") then
 				active = not active
-				printHelpString((active and 'User Control Remap for PedFuncs activated' or 'User Control Remap for PedFuncs deactivated'))
+				printHelpString((active and 'Assistant for PedFuncs activated' or 'Assistant for PedFuncs deactivated'))
 			end
 		end
 		if active then
