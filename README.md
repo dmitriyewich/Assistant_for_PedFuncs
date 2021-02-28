@@ -6,9 +6,9 @@
 
 Активация:
 
-Для одиночки: чит-код 'remap', RMB + Left/Right - _remap, RMB + Up/Down - index
+**Для одиночки:** чит-код 'remap', RMB + Left/Right - _remap, RMB + Up/Down - index
 
-Для сампа: /pdremap - RMB + ..., /setremap [id] [index] [_remap](/setremap 174 0 5), /getremap [id] [index](/getremap 174 0)
+**Для сампа:** /pdremap - RMB + ..., /setremap [id] [index] [_remap](/setremap 174 0 5), /getremap [id] [index](/getremap 174 0)
 Ид можно опустить, если нужно изменить/узнать свою текстуру
 
 
