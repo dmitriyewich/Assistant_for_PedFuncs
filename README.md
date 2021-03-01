@@ -1,5 +1,5 @@
 # Assistant for PedFuncs
-![main_screenshot](https://i.imgur.com/xH70lbm.jpg)
+![main_screenshot](https://i.imgur.com/idTOGzO.png)
 Оказывается из PedFuncs можно экспортировать функцию и вручную назначать текстуру. Собственно вот.
 Скрипт позволяет узнать текущую текстуру и назначить другую.
 ❗Отcчет текстур идет с конца, например в чате/рендере bmydj_remap0 равен bmydj_remap(последний) в .txd
