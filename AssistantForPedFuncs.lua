@@ -4,7 +4,7 @@ script_description("Assistant for PedFuncs")
 script_url("https://vk.com/dmitriyewichmods")
 script_dependencies("ffi")
 script_properties('work-in-pause')
-script_version('1.0.4')
+script_version('1.1')
 
 require("moonloader")
 local dlstatus = require "moonloader".download_status
@@ -12,6 +12,10 @@ local ffi = require('ffi')
 local llfs, lfs = pcall(require, 'lfs')
 local vkeys = require('vkeys')
 local inicfg = require 'inicfg'
+local lencoding, encoding = pcall(require, 'encoding') assert(lencoding, 'Library \'encoding\' not found.')
+encoding.default = 'CP1251'
+u8 = encoding.UTF8
+CP1251 = encoding.CP1251
 
 if llfs then
 	function dirtree(dir)
@@ -24,18 +28,14 @@ if llfs then
 			for entry in lfs.dir(dir) do
 				if entry ~= "." and entry ~= ".." then
 					entry=dir.."/"..entry
-					local attr=lfs.attributes(entry)
-					coroutine.yield(entry,attr)
-					if attr.mode == "directory" then
-						yieldtree(entry)
-					end
+					coroutine.yield(entry)
 				end
 			end
 		end
 		return coroutine.wrap(function() yieldtree(dir) end)
 	end
 
-	for filename, attr in dirtree(getGameDirectory()) do
+	for filename, _ in dirtree(getGameDirectory()) do
 		if string.find(filename, 'PedFuncs.asi') then
 			lpedfuncs, pedfuncs = pcall(ffi.load, filename)
 		end
@@ -101,14 +101,14 @@ ffi.cdef[[
 	void Ext_SetPedRemap(uint32_t, int index, int num);
 ]]
 
-local my_font = renderCreateFont('Verdana', 12, 12)
+local my_font = renderCreateFont('Arial', 12, 12)
 local active = false
 local active_change_ini = true
 
 function main()
-
+	--------------
 	checklibs() -- delete
-	
+	--------------
 	local samp = 0
 	if isSampLoaded() then
 		if isSampfuncsLoaded() then
@@ -135,8 +135,8 @@ function main()
 	
 	if mainIni.settings.help_text then
 		if mainIni.settings.language == 'ru' or mainIni.settings.language == 'RU' then
-			text_help = '\n{ff6666}Отсчет начинается с конца\n{ff6666}Например, в чате/рендере bmydj_remap0 = bmydj_remap(последний) в bmydj.txd\n{ff6666}Если скин сломался, то _remap начал новый круг :)'
-			text_help_samp = ' | {ff6666}Отсчет начинается с конца, например, bmydj_remap0 равен to bmydj_remap(последний) в .txd'
+			text_help = u8:decode'\n{ff6666}Отсчет начинается с конца\n{ff6666}Например, в чате/рендере bmydj_remap0 = bmydj_remap(последний) в bmydj.txd\n{ff6666}Если скин сломался, то _remap начал новый круг :)'
+			text_help_samp = u8:decode' | {ff6666}Отсчет начинается с конца, например, bmydj_remap0 равен to bmydj_remap(последний) в .txd'
 		end
 		if mainIni.settings.language == 'en' or mainIni.settings.language == 'EN' then
 			text_help = '\n{ff6666}Counting goes from the end\n{ff6666}Example, in chat/render bmydj_remap0 = bmydj_remap(last) in bmydj.txd\n{ff6666}If the skin is broken, it means that _remap is the last :)'
@@ -159,10 +159,17 @@ function main()
 		end
 		
 		if active then
+			local delta = getMousewheelDelta()
 			local rresult, pped = getCharPlayerIsTargeting(PLAYER_HANDLE)
 			if rresult then
 				local skin_id = getCharModel(pped)
 				renderFontDrawText(my_font, 'Index: '..index..'\nModel: '..NameModel(skin_id)..'('..skin_id..')\n_remap: '..pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index)..text_help, sw / 2, sh / 2, 0xFFFFFFFF)
+					if pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index) >= -1 then 
+						pedfuncs.Ext_SetPedRemap(getCharPointer(pped), index, pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index) + delta)
+						if pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index) <= -1 then
+							pedfuncs.Ext_SetPedRemap(getCharPointer(pped), index, -1)
+						end
+					end
 				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyPressed(vkeys.VK_UP) then
 					if index >= 0 and index <= 3 then 
 						index = index + 1
@@ -196,6 +203,12 @@ function main()
 
 			if isKeyDown(vkeys.VK_RCONTROL) then
 				renderFontDrawText(my_font, 'Index: '..index..'\nModel: '..NameModel(getCharModel(PLAYER_PED))..'('..getCharModel(PLAYER_PED)..')\n_remap: '..pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), index)..text_help, sw / 2, sh / 2, 0xFFFFFFFF)
+				if pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), index) >= -1 then 
+					pedfuncs.Ext_SetPedRemap(getCharPointer(PLAYER_PED), index, pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), index) + delta)
+					if pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), index) <= -1 then
+						pedfuncs.Ext_SetPedRemap(getCharPointer(PLAYER_PED), index, -1)
+					end
+				end
 			end
 			if isKeyDown(vkeys.VK_RCONTROL) and wasKeyPressed(vkeys.VK_UP) then
 				if index >= 0 and index <= 3 then 
@@ -283,7 +296,7 @@ function split(str, delim, plain)
 	return tokens
 end
 
-
+-----------------------
 function checklibs() -- delete to the end
 	if not llfs then	  
 		lua_thread.create(function()
@@ -318,3 +331,4 @@ function downloadFile(name, path, link)
 		end)
 	end
 end -- end
+-----------------------
