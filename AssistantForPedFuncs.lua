@@ -164,10 +164,12 @@ function main()
 			if rresult then
 				local skin_id = getCharModel(pped)
 				renderFontDrawText(my_font, 'Index: '..index..'\nModel: '..NameModel(skin_id)..'('..skin_id..')\n_remap: '..pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index)..text_help, sw / 2, sh / 2, 0xFFFFFFFF)
-					if pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index) >= -1 then 
-						pedfuncs.Ext_SetPedRemap(getCharPointer(pped), index, pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index) + delta)
-						if pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index) <= -1 then
-							pedfuncs.Ext_SetPedRemap(getCharPointer(pped), index, -1)
+					if delta ~= 0 then
+						if pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index) >= -1 then 
+							pedfuncs.Ext_SetPedRemap(getCharPointer(pped), index, pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index) + delta)
+							if pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index) <= -1 then
+								pedfuncs.Ext_SetPedRemap(getCharPointer(pped), index, -1)
+							end
 						end
 					end
 				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyPressed(vkeys.VK_UP) then
@@ -203,10 +205,12 @@ function main()
 
 			if isKeyDown(vkeys.VK_RCONTROL) then
 				renderFontDrawText(my_font, 'Index: '..index..'\nModel: '..NameModel(getCharModel(PLAYER_PED))..'('..getCharModel(PLAYER_PED)..')\n_remap: '..pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), index)..text_help, sw / 2, sh / 2, 0xFFFFFFFF)
-				if pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), index) >= -1 then 
-					pedfuncs.Ext_SetPedRemap(getCharPointer(PLAYER_PED), index, pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), index) + delta)
-					if pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), index) <= -1 then
-						pedfuncs.Ext_SetPedRemap(getCharPointer(PLAYER_PED), index, -1)
+				if delta ~= 0 then
+					if pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), index) >= -1 then 
+						pedfuncs.Ext_SetPedRemap(getCharPointer(PLAYER_PED), index, pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), index) + delta)
+						if pedfuncs.Ext_GetPedRemap(getCharPointer(PLAYER_PED), index) <= -1 then
+							pedfuncs.Ext_SetPedRemap(getCharPointer(PLAYER_PED), index, -1)
+						end
 					end
 				end
 			end
