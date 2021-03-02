@@ -4,7 +4,7 @@ script_description("Assistant for PedFuncs")
 script_url("https://vk.com/dmitriyewichmods")
 script_dependencies("ffi")
 script_properties('work-in-pause')
-script_version('1.1')
+script_version('1.6')
 
 require("moonloader")
 local dlstatus = require "moonloader".download_status
@@ -13,6 +13,7 @@ local llfs, lfs = pcall(require, 'lfs')
 local vkeys = require('vkeys')
 local inicfg = require 'inicfg'
 local lencoding, encoding = pcall(require, 'encoding') assert(lencoding, 'Library \'encoding\' not found.')
+local glob = require "lib.game.globals"
 encoding.default = 'CP1251'
 u8 = encoding.UTF8
 CP1251 = encoding.CP1251
@@ -110,14 +111,7 @@ function main()
 	checklibs() -- delete
 	--------------
 	local samp = 0
-	if isSampLoaded() then
-		if isSampfuncsLoaded() then
-			samp = 2
-		else
-			print("Sampfuncs required to work on samp mode.")
-			samp = 1
-		end
-	end
+	if isSampLoaded() then samp = 2 end
 	
 	if samp == 2 then
 		sampRegisterChatCommand('pdremap', function(arg)
@@ -150,11 +144,23 @@ function main()
 	local sw, sh = getScreenResolution()
 	local index = 0
 
+	local mission_char_tbl = {86, 252, 265, 266, 267, 269, 270, 271, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299}
+
 	while true do wait(0)
-		if samp == 0 or samp == 1 then
+		if samp == 0 then
 			if testCheat("remap") then
 				active = not active
 				printHelpString((active and 'Assistant for PedFuncs activated' or 'Assistant for PedFuncs deactivated'))
+			end
+			if hasCutsceneLoaded() or getGameGlobal(glob.ONMISSION) == 1 then
+				for k, v in ipairs(getAllChars()) do
+					mission_char = getCharModel(v)
+					if mission_char == mission_char_tbl then
+						if pedfuncs.Ext_GetPedRemap(getCharPointer(v), 0) ~= -1 then 
+							pedfuncs.Ext_SetPedRemap(getCharPointer(v), 0, -1)
+						end
+					end
+				end
 			end
 		end
 		
