@@ -111,9 +111,9 @@ function main()
 	checklibs() -- delete
 	--------------
 	local samp = 0
-	if isSampLoaded() then samp = 2 end
+	if isSampLoaded() then samp = 1 end
 	
-	if samp == 2 then
+	if samp == 1 then
 		sampRegisterChatCommand('pdremap', function(arg)
 			active = not active
 			sampAddChatMessage((active and 'Assistant for PedFuncs activated, {ff6666}RMB + Left/Right - _remap, RMB + Up/Down - index' or 'Assistant for PedFuncs deactivated'), -1)
