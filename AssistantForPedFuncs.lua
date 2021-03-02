@@ -4,7 +4,7 @@ script_description("Assistant for PedFuncs")
 script_url("https://vk.com/dmitriyewichmods")
 script_dependencies("ffi")
 script_properties('work-in-pause')
-script_version('1.6')
+script_version('1.2')
 
 require("moonloader")
 local dlstatus = require "moonloader".download_status
