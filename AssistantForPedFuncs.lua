@@ -4,44 +4,17 @@ script_description("Assistant for PedFuncs")
 script_url("https://vk.com/dmitriyewichmods")
 script_dependencies("ffi")
 script_properties('work-in-pause')
-script_version('1.2')
+script_version('1.3')
 
 require("moonloader")
-local dlstatus = require "moonloader".download_status
 local ffi = require('ffi')
-local llfs, lfs = pcall(require, 'lfs')
+local lpedfuncs, pedfuncs = pcall(ffi.load, 'PedFuncs.asi')
 local vkeys = require('vkeys')
 local inicfg = require 'inicfg'
 local lencoding, encoding = pcall(require, 'encoding') assert(lencoding, 'Library \'encoding\' not found.')
 local glob = require "lib.game.globals"
 encoding.default = 'CP1251'
 u8 = encoding.UTF8
-CP1251 = encoding.CP1251
-
-if llfs then
-	function dirtree(dir)
-		assert(dir and dir ~= "", "directory parameter is missing or empty")
-		if string.sub(dir, -1) == "/" then
-			dir=string.sub(dir, 1, -2)
-		end
-
-		local function yieldtree(dir)
-			for entry in lfs.dir(dir) do
-				if entry ~= "." and entry ~= ".." then
-					entry=dir.."/"..entry
-					coroutine.yield(entry)
-				end
-			end
-		end
-		return coroutine.wrap(function() yieldtree(dir) end)
-	end
-
-	for filename, _ in dirtree(getGameDirectory()) do
-		if string.find(filename, 'PedFuncs.asi') then
-			lpedfuncs, pedfuncs = pcall(ffi.load, filename)
-		end
-	end
-end
 
 local mainIni = inicfg.load({
 	settings = {
@@ -107,9 +80,7 @@ local active = false
 local active_change_ini = true
 
 function main()
-	--------------
-	checklibs() -- delete
-	--------------
+
 	local samp = 0
 	if isSampLoaded() then samp = 1 end
 	
@@ -167,7 +138,7 @@ function main()
 		if active then
 			local delta = getMousewheelDelta()
 			local rresult, pped = getCharPlayerIsTargeting(PLAYER_HANDLE)
-			if rresult then
+			if rresult and isKeyDown(vkeys.VK_RBUTTON) then
 				local skin_id = getCharModel(pped)
 				renderFontDrawText(my_font, 'Index: '..index..'\nModel: '..NameModel(skin_id)..'('..skin_id..')\n_remap: '..pedfuncs.Ext_GetPedRemap(getCharPointer(pped), index)..text_help, sw / 2, sh / 2, 0xFFFFFFFF)
 					if delta ~= 0 then
@@ -305,40 +276,3 @@ function split(str, delim, plain)
 	until not pos
 	return tokens
 end
-
------------------------
-function checklibs() -- delete to the end
-	if not llfs then	  
-		lua_thread.create(function()
-			print('Loading the required libraries..')
-			if not llfs then
-				downloadFile('lfs.dll', getWorkingDirectory()..'\\lib\\lfs.dll', 'https://github.com/dmitriyewich/Personal-Skin-Changer/raw/main/lib/lfs.dll')
-				while not doesFileExist(getWorkingDirectory()..'\\lib\\lfs.dll') do wait(0) end
-				reloadScripts()
-			else
-				wait(0)
-			end
-			print('Library loading completed successfully. Reloading scripts...')
-			wait(1000)
-			reloadScripts()
-		end)
-		return false
-	end
-	return true
-end
-
-function downloadFile(name, path, link)
-	if not doesFileExist(path) then
-		print('Download file {006AC2}«'..name..'»')
-		downloadUrlToFile(link, path, function(id, status, p1, p2)
-			if status == dlstatus.STATUSEX_ENDDOWNLOAD then
-				if doesFileExist(path) then
-					print('File {006AC2}«'..name..'»{FFFFFF} downloaded!')
-				else
-					print('Failed to load file {006AC2}«'..name..'»')
-				end
-			end
-		end)
-	end
-end -- end
------------------------
