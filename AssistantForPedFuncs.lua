@@ -7,12 +7,12 @@ script_properties('work-in-pause')
 script_version('1.3')
 
 require("moonloader")
-local ffi = require('ffi')
-local lpedfuncs, pedfuncs = pcall(ffi.load, 'PedFuncs.asi')
-local vkeys = require('vkeys')
-local inicfg = require 'inicfg'
+local lffi, ffi =  pcall(require, 'ffi') assert(lffi, 'Library \'ffi\' not found.')
+local lpedfuncs, pedfuncs = pcall(ffi.load, 'PedFuncs.asi') assert(lpedfuncs, 'Library \'PedFuncs.asi\' not found.')
+local lvkeys, vkeys =  pcall(require, 'vkeys') assert(lvkeys, 'Library \'vkeys\' not found.')
+local linicfg, inicfg =  pcall(require, 'inicfg') assert(linicfg, 'Library \'inicfg\' not found.')
 local lencoding, encoding = pcall(require, 'encoding') assert(lencoding, 'Library \'encoding\' not found.')
-local glob = require "lib.game.globals"
+local lglob, glob =  pcall(require, 'lib.game.globals') assert(lvkeys, 'Library \'lib.game.globals\' not found.')
 encoding.default = 'CP1251'
 u8 = encoding.UTF8
 
