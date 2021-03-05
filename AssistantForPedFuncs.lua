@@ -12,7 +12,7 @@ local lpedfuncs, pedfuncs = pcall(ffi.load, 'PedFuncs.asi') assert(lpedfuncs, 'L
 local lvkeys, vkeys =  pcall(require, 'vkeys') assert(lvkeys, 'Library \'vkeys\' not found.')
 local linicfg, inicfg =  pcall(require, 'inicfg') assert(linicfg, 'Library \'inicfg\' not found.')
 local lencoding, encoding = pcall(require, 'encoding') assert(lencoding, 'Library \'encoding\' not found.')
-local lglob, glob =  pcall(require, 'lib.game.globals') assert(lvkeys, 'Library \'lib.game.globals\' not found.')
+local lglob, glob =  pcall(require, 'lib.game.globals') assert(lglob, 'Library \'lib.game.globals\' not found.')
 encoding.default = 'CP1251'
 u8 = encoding.UTF8
 
