@@ -4,7 +4,7 @@ script_description("Assistant for PedFuncs")
 script_url("https://vk.com/dmitriyewichmods")
 script_dependencies("ffi")
 script_properties('work-in-pause')
-script_version('1.3')
+script_version('1.3.1')
 
 require("moonloader")
 local lffi, ffi =  pcall(require, 'ffi') assert(lffi, 'Library \'ffi\' not found.')
@@ -150,17 +150,17 @@ function main()
 						end
 					end
 				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyPressed(vkeys.VK_UP) then
-					if index >= 0 and index <= 3 then 
+					if index >= 0 and index <= 7 then 
 						index = index + 1
-						if index <= 0 or index > 3 then
+						if index <= 0 or index > 7 then
 							index = 0
 						end
 					end
 				end
 				if isKeyDown(vkeys.VK_RBUTTON) and wasKeyPressed(vkeys.VK_DOWN) then
-					if index >= 0 and index <= 3 then 
+					if index >= 0 and index <= 7 then 
 						index = index - 1
-						if index <= 0 or index > 3 then
+						if index <= 0 or index > 7 then
 							index = 0
 						end
 					end
@@ -192,17 +192,17 @@ function main()
 				end
 			end
 			if isKeyDown(vkeys.VK_RCONTROL) and wasKeyPressed(vkeys.VK_UP) then
-				if index >= 0 and index <= 3 then 
+				if index >= 0 and index <= 7 then 
 					index = index + 1
-					if index <= 0 or index > 3 then
+					if index <= 0 or index > 7 then
 						index = 0
 					end
 				end
 			end
 			if isKeyDown(vkeys.VK_RCONTROL) and wasKeyPressed(vkeys.VK_DOWN) then
-				if index >= 0 and index <= 3 then 
+				if index >= 0 and index <= 7 then 
 					index = index - 1
-					if index <= 0 or index > 3 then
+					if index <= 0 or index > 7 then
 						index = 0
 					end
 				end
